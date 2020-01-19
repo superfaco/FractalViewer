@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.button1 = new System.Windows.Forms.Button();
             this.cbxFractals = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savePictureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,6 +68,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(800, 450);
             this.splitContainer1.SplitterDistance = 266;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(173, 65);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Generate";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // cbxFractals
             // 
@@ -108,16 +118,6 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(173, 65);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Generate";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -141,14 +141,14 @@
             // savePictureToolStripMenuItem
             // 
             this.savePictureToolStripMenuItem.Name = "savePictureToolStripMenuItem";
-            this.savePictureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.savePictureToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.savePictureToolStripMenuItem.Text = "Save picture";
             this.savePictureToolStripMenuItem.Click += new System.EventHandler(this.savePictureToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -165,6 +165,7 @@
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // saveFileDialog1
             // 
