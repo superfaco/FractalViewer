@@ -10,30 +10,41 @@ using System.Windows.Forms;
 
 namespace FractalViewer
 {
+    
+
     public partial class Form1 : Form
     {
-        
+
+        private int maxTreeIterations;
+        private int maxSierTriaIterations;
+        private Bitmap bmp;
+        private Fractal currentFractal;
+
         private enum Fractal
         {
             RandomTree = 0,
             SierpinskiTriangule
         };
 
-        private int maxTreeIterations;
-        private Bitmap bmp;
+        //Margin percentages.
+        private int topMarginPercentage;
+        private int bottomMarginPercentage;
+        private int leftMarginPercentage;
+        private int rightMarginPercentage;
 
         public Form1()
         {
             InitializeComponent();
+            topMarginPercentage = 10;
+            bottomMarginPercentage = 10;
+            leftMarginPercentage = 10;
+            rightMarginPercentage = 10;
         }
 
         #region Fractal draw methods
         #region Random tree methods
         private void DrawRandomTree(Bitmap bmp)
         {
-            //Margin percentages.
-            int topMarginPercentage = 10;
-            int bottomMarginPercentage = 10;
 
             //For some randomness.
             Random random = new Random();
@@ -60,9 +71,9 @@ namespace FractalViewer
             g.DrawRectangle(Pens.White, 0, 0, bmp.Width, bmp.Height);
             //We simply draw the line.
             //First, let's create a starting random pen color.
-            Color penColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256), random.Next(256));
+            Color penColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
             //And a final pen color as well.
-            Color finalPenColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256), random.Next(256));
+            Color finalPenColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
             float penWidth = 15;
             g.DrawLine(new Pen(penColor, penWidth), (float)treeTrunkOriginX, (float)treeTrunkOriginY, (float)treeTrunkFinalX, (float)treeTrunkFinalY);
 
@@ -95,6 +106,80 @@ namespace FractalViewer
             }
         }
         #endregion
+        #region Sierpinski triangule methods
+        private void DrawSierpinskiTriangule(Bitmap bmp)
+        {
+            //For some randomness
+            Random random = new Random();
+
+            //First, les find the 3 points of the main triangule.
+            PointF leftPoint = new PointF();
+            PointF rightPoint = new PointF();
+            PointF middlePoint = new PointF();
+
+            leftPoint.X = (float)(leftMarginPercentage / 100.0 * bmp.Width);
+            leftPoint.Y = (float)(bmp.Height - bottomMarginPercentage / 100.0 * bmp.Height);
+
+            rightPoint.X = (float)(bmp.Width - rightMarginPercentage / 100.0 * bmp.Width);
+            rightPoint.Y = (float)(bmp.Height - bottomMarginPercentage / 100.0 * bmp.Height);
+
+            middlePoint.X = (float)((leftMarginPercentage / 100.0 * bmp.Width) + ((bmp.Width - (leftMarginPercentage / 100.0 * bmp.Width) - (rightMarginPercentage / 100.0 * bmp.Width)) / 2.0));
+            middlePoint.Y = (float)(0 + topMarginPercentage / 100.0 * bmp.Height);
+
+            Graphics g = Graphics.FromImage(bmp);
+
+            //We generate 2 random colors for use as range
+            Color startingColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
+            Color endingColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
+
+            //We generate random number of iterations..
+            maxSierTriaIterations = random.Next(6, 13);
+
+            //Let's calculate the color increment..
+            int colorInc = (endingColor.ToArgb() - startingColor.ToArgb()) / maxSierTriaIterations;
+            int penWidth = 1;
+
+            //We draw the triangule.
+            g.DrawLine(new Pen(startingColor, penWidth), leftPoint, rightPoint);
+            g.DrawLine(new Pen(startingColor, penWidth), rightPoint, middlePoint);
+            g.DrawLine(new Pen(startingColor, penWidth), middlePoint, leftPoint);
+
+            //We draw the recursive inverted triangule..
+            _DrawInvertedTrianguleRecursively(g, leftPoint, rightPoint, middlePoint, startingColor.ToArgb() + colorInc, penWidth, colorInc, 1);
+
+        }
+
+        private void _DrawInvertedTrianguleRecursively(Graphics g, PointF left, PointF right, PointF middle, int penColor, int penWidth, int colorInc, int iteration)
+        {
+            if(iteration <= maxSierTriaIterations)
+            {
+                //Let's find the points for the inverted triangule..
+                PointF l = new PointF();
+                PointF r = new PointF();
+                PointF m = new PointF();
+
+                l.X = (float)(left.X + ((middle.X - left.X) / 2.0));
+                l.Y = (float)(middle.Y + ((left.Y - middle.Y) / 2.0));
+
+                r.X = (float)(right.X - ((middle.X - left.X) / 2.0));
+                r.Y = (float)(middle.Y + ((left.Y - middle.Y) / 2.0));
+
+                m.X = (float)(left.X + ((right.X - left.X) / 2.0));
+                m.Y = left.Y;
+
+                //We draw the triangule..
+                g.DrawLine(new Pen(Color.FromArgb(penColor), penWidth), l, r);
+                g.DrawLine(new Pen(Color.FromArgb(penColor), penWidth), r, m);
+                g.DrawLine(new Pen(Color.FromArgb(penColor), penWidth), m, l);
+
+                //Call the recursive method for each of the 3 new triangules created..
+                _DrawInvertedTrianguleRecursively(g, left, m, l, penColor + colorInc, penWidth, colorInc, iteration + 1);
+                _DrawInvertedTrianguleRecursively(g, m, right, r, penColor + colorInc, penWidth, colorInc, iteration + 1);
+                _DrawInvertedTrianguleRecursively(g, l, r, middle, penColor + colorInc, penWidth, colorInc, iteration + 1);
+
+            }
+        }
+        #endregion
         #endregion
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
@@ -107,17 +192,18 @@ namespace FractalViewer
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Fractal fractal = (Fractal)cbxFractals.SelectedIndex;
+            currentFractal = (Fractal)cbxFractals.SelectedIndex;
 
-            if (Enum.IsDefined(typeof(Fractal), fractal))
+            if (Enum.IsDefined(typeof(Fractal), currentFractal))
             {
                 bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                switch (fractal)
+                switch (currentFractal)
                 {
                     case Fractal.RandomTree:
                         DrawRandomTree(bmp);
                         break;
                     case Fractal.SierpinskiTriangule:
+                        DrawSierpinskiTriangule(bmp);
                         break;
                 }
             }
@@ -131,10 +217,32 @@ namespace FractalViewer
 
         private void savePictureToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(saveFileDialog1.ShowDialog() == DialogResult.OK)
+            if(bmp != null && Enum.IsDefined(typeof(Fractal), currentFractal))
             {
-                bmp.Save(saveFileDialog1.FileName);
+                //We find out what fractal is being saved.
+                string name = "image";
+                switch (currentFractal)
+                {
+                    case Fractal.RandomTree:
+                        name = "random_tree";
+                        break;
+                    case Fractal.SierpinskiTriangule:
+                        name = "sierpinski_triangule";
+                        break;
+                }
+                name += ".bmp";
+                saveFileDialog1.FileName = name;
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    bmp.Save(saveFileDialog1.FileName);
+                }
             }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Display simple window message..
+            MessageBox.Show("Created by Fernando Alfonso Caldera Olivas\r\n- FACO");
         }
     }
 }
